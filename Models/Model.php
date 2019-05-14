@@ -109,42 +109,35 @@ abstract class Model
 
 
     private function create()
-    {
-        self::createIfNotThere();
-        $props = self::getDbProps();
-        //$vars = get_object_vars($this);
-        $vars = [];
-        foreach ($props as $prop) {
-            $prop->setAccessible(true);
-            $vars[$prop->getName()] = ($prop->getValue($this) !== '' ? $prop->getValue($this) : null);
-            if($prop->getValue($this) !== '') {
-                settype($vars[$prop->getName()], self::getPhpType($prop));
-            }
-        }
-        unset($vars["id"]);
-
-        $table = self::table();
-
-        $fields = "(`" . implode("`, `", array_keys($vars)) . "`)";
-        $values = "(:" . implode(", :", array_keys($vars)) . ")";
-
-        $qry = "INSERT INTO `$table` $fields VALUES $values;";
-
-
-
-        $stmt = DB::prepare($qry);
-
-        try {
-            $stmt->execute($vars);
-            $this->id = DB::lastId();
-        }
-        catch(Exception $e) {
-            echo "Could not execute query: <br>" . $stmt->queryString . "<br><br>";
-            var_dump($vars);
-            echo "<br>" . $e->getFile() . ": " . $e->getLine() . "<br>message: " . $e->getMessage();
-            die();
-        }
-    }
+   {
+       self::createIfNotThere();
+       $props = self::getDbProps();
+       //$vars = get_object_vars($this);
+       $vars = [];
+       foreach ($props as $prop) {
+           $prop->setAccessible(true);
+           $vars[$prop->getName()] = ($prop->getValue($this) !== '' ? $prop->getValue($this) : null);
+           if($prop->getValue($this) !== '') {
+               settype($vars[$prop->getName()], self::getPhpType($prop));
+           }
+       }
+       unset($vars["id"]);
+       $table = self::table();
+       $fields = "(`" . implode("`, `", array_keys($vars)) . "`)";
+       $values = "(:" . implode(", :", array_keys($vars)) . ")";
+       $qry = "INSERT INTO `$table` $fields VALUES $values;";
+       $stmt = DB::prepare($qry);
+       try {
+           $stmt->execute($vars);
+           $this->id = DB::lastId();
+       }
+       catch(Exception $e) {
+           echo "Could not execute query: <br>" . $stmt->queryString . "<br><br>";
+           var_dump($vars);
+           echo "<br>" . $e->getFile() . ": " . $e->getLine() . "<br>message: " . $e->getMessage();
+           die();
+       }
+   }
 
 
     private function update($exclude = [])
@@ -179,7 +172,6 @@ abstract class Model
             echo $e->getFile() . ": " . $e->getLine() . "<br>message: " . $e->getMessage();
         }
     }
-
 
     private function delete()
     {
@@ -424,6 +416,18 @@ abstract class Model
         }
     }
 
+    public static function find() {
+        try {
+            $table = strtolower(get_called_class());
+            $qry = "SELECT * FROM `$table`";
+            $stmt = DB::prepare($qry);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_CLASS, get_called_class());
+        } catch (Exception $e) {
+            echo "";
+            die();
+        }
+    }
 
     private static function getPhpType($prop)
     {

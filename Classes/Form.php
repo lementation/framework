@@ -48,7 +48,7 @@ class Form
             $first = false;
         }
 
-        $html .= '<input type="submit" class="btn btn-primary" value="submit">';
+        $html .= '<input type="submit" class="btn btn-primary" value="Submit">';
 
         $html .= "</form>";
 

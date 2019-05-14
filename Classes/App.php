@@ -23,7 +23,6 @@ class App
         array_push($_SESSION['errors'], self::calledBy() . "|". $error);
     }
 
-
     public static function getErrors()
     {
         self::initErrors();
@@ -117,7 +116,6 @@ class App
         }
         return self::$user;
     }
-
 
     public static function checkAuth($role, $user = null)
     {
